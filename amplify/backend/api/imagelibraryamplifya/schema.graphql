@@ -1,0 +1,33 @@
+type S3Object {
+  bucket: String!
+  region: String!
+  key: String!
+}
+
+type Picture 
+  @model 
+  @auth(
+    rules: [
+      {
+        allow: owner
+        ownerField: "owner" 
+        operations: [create, update, delete]
+      }
+    ]
+  ) 
+  @searchable {
+  id: ID!
+  name: String
+  owner: String
+  labels: [String]
+
+  # Reference the S3Object type from a field
+  file: S3Object
+}
+
+type Subscription {
+  newOnCreatePicture: Picture @aws_subscribe(mutations: ["createPicture"])
+    newOnUpdatePicture: Picture @aws_subscribe(mutations: ["updatePicture"])
+  newOnDeletePicture: Picture @aws_subscribe(mutations: ["deletePicture"])
+
+}
